@@ -168,6 +168,80 @@ def split_lines(html):
     return html.split("<br>")
 
 
+def _tokenize(html):
+    """Walk exported minihtml as ``(kind, text)`` pairs.
+
+    Yields ``("tag", ...)`` for markup and ``("char", ...)`` for one unit of
+    visible width, so a caller can count columns without counting markup. HTML
+    entities such as ``&nbsp;`` and ``&amp;`` are single visible characters
+    despite being several bytes.
+    """
+    index = 0
+    length = len(html)
+    while index < length:
+        char = html[index]
+        if char == "<":
+            end = html.find(">", index)
+            if end == -1:
+                yield "char", html[index:]
+                return
+            yield "tag", html[index : end + 1]
+            index = end + 1
+        elif char == "&":
+            end = html.find(";", index)
+            if end == -1 or end - index > 10:
+                yield "char", char
+                index += 1
+            else:
+                yield "char", html[index : end + 1]
+                index = end + 1
+        else:
+            yield "char", char
+            index += 1
+
+
+def wrap_line(html, width, indent=2):
+    """Soft-wrap one highlighted line to `width` visible characters.
+
+    minihtml offers no horizontal scrolling and no width property, so a single
+    long code line would otherwise stretch the whole preview and stop every
+    paragraph in the document from wrapping at the pane edge.
+
+    Colour is preserved across the break by closing the open span before the
+    newline and reopening it after, which is safe because ``export_to_html``
+    emits a flat run of spans with no nesting.
+    """
+    if width < 10:
+        return html
+
+    open_tag = None
+    column = 0
+    out = []
+    continuation = "&nbsp;" * indent
+
+    for kind, text in _tokenize(html):
+        if kind == "tag":
+            if text.startswith("</"):
+                open_tag = None
+            elif not text.startswith("<br"):
+                open_tag = text
+            out.append(text)
+            continue
+
+        if column >= width:
+            if open_tag:
+                out.append("</span>")
+            out.append("<br>" + continuation)
+            if open_tag:
+                out.append(open_tag)
+            column = indent
+
+        out.append(text)
+        column += 1
+
+    return "".join(out)
+
+
 def clear_cache(window=None):
     """Drop cached syntax lookups, and any panels belonging to `window`."""
     _syntax_cache.clear()

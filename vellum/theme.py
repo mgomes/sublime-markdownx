@@ -24,6 +24,24 @@ DEFAULTS = {
 }
 
 
+#: Appended to whatever family the user asks for. "system" is Sublime's UI
+#: font; the generics behind it catch the case where even that fails.
+BODY_FALLBACKS = ("system", "Helvetica Neue", "sans-serif")
+CODE_FALLBACKS = ("Menlo", "Consolas", "monospace")
+
+
+def _stack(preferred, fallbacks):
+    """Build a font-family stack, putting `preferred` first if it is set.
+
+    Names are never quoted. Unlike CSS proper, minihtml fails to parse a quoted
+    family -- even one containing spaces -- and renders nothing at all, so
+    ``Helvetica Neue`` has to be written bare.
+    """
+    names = [preferred] if preferred else []
+    names.extend(name for name in fallbacks if name != preferred)
+    return ", ".join(name.replace(",", " ").strip() for name in names)
+
+
 def parse_hex(value, fallback="#000000"):
     """Parse ``#rgb``/``#rrggbb``/``#rrggbbaa`` into an ``(r, g, b)`` triple."""
     if not isinstance(value, str) or not value.startswith("#"):
@@ -83,9 +101,9 @@ class Theme:
         contrast = self.fg if not self.dark else "#000000"
         self.code_bg = blend(contrast, self.bg, 0.06 if self.dark else 0.04)
         self.border = style.get("guide") or blend(self.fg, self.bg, 0.25)
-        self.rule = blend(self.fg, self.bg, 0.18)
-        self.stripe = blend(self.fg, self.bg, 0.05)
-        self.header_bg = blend(self.fg, self.bg, 0.10)
+        self.rule = blend(self.fg, self.bg, 0.35)
+        self.stripe = blend(self.fg, self.bg, 0.06)
+        self.header_bg = blend(self.fg, self.bg, 0.14)
 
         self.quote_border = blend(self.accent, self.bg, 0.7)
         self.checked = scope_fg("markup.inserted", scheme("greenish"))
@@ -93,13 +111,26 @@ class Theme:
         self.warn_border = blend(scheme("orangish"), self.bg, 0.45)
 
         view_settings = view.settings()
-        self.code_font = settings.get("code_font") or view_settings.get("font_face") or "monospace"
-        self.body_font = settings.get("body_font") or "system"
 
-        base = settings.get("font_size")
-        if not base:
-            base = (view_settings.get("font_size") or 12) + 1
-        self.size = int(base)
+        # Both faces are configurable. Code follows the editor's font by default
+        # so fences look identical in both panes; body text uses the UI face,
+        # since proportional type reads better for prose.
+        #
+        # Each is emitted as a stack. minihtml honours comma-separated families
+        # and falls through correctly, but a single unresolvable name lands on
+        # Times New Roman -- so a typo in this setting would otherwise silently
+        # turn the whole preview serif.
+        self.code_font = _stack(
+            settings.get("code_font") or view_settings.get("font_face"),
+            CODE_FALLBACKS,
+        )
+        self.body_font = _stack(settings.get("body_font"), BODY_FALLBACKS)
+
+        editor_size = view_settings.get("font_size") or 12
+        # Proportional text reads smaller than monospace at equal size, so the
+        # body is nudged up a point unless told otherwise.
+        self.size = int(settings.get("font_size") or (editor_size + 1))
+        self.code_size = int(settings.get("code_font_size") or max(9, round(self.size * 0.92)))
 
     def css(self):
         """Return the stylesheet for a preview document."""
@@ -127,20 +158,26 @@ class Theme:
             h3=int(s * 1.3),
             h4=int(s * 1.12),
             small=max(9, int(s * 0.85)),
-            code_size=max(9, int(s * 0.92)),
+            code_size=self.code_size,
         )
 
 
 CSS_TEMPLATE = """
 body {{
     margin: 0;
-    padding: {s}px {s}px {s}px {s}px;
+    padding: 0;
     background-color: {bg};
     color: {fg};
     font-family: {body_font};
     font-size: {s}px;
     line-height: 1.6;
 }}
+
+/* A block phantom sizes itself to its content and never wraps, so a long
+   paragraph would run off the pane instead of reflowing. Giving the page an
+   explicit pixel width restores wrapping. `width` is absent from the documented
+   minihtml property list but is honoured -- verified against build 4200. */
+.page {{ padding: {s}px {s}px {s}px {s}px; }}
 
 a {{ color: {link}; text-decoration: none; }}
 
@@ -158,9 +195,20 @@ h5, h6 {{ font-size: {s}px; color: {muted}; }}
 
 p {{ margin-top: 0; margin-bottom: {s}px; }}
 
-ul, ol {{ margin-top: 0; margin-bottom: {s}px; padding-left: {s}px; }}
+ul {{ margin-top: 0; margin-bottom: {s}px; padding-left: {s}px; list-style-type: disc; }}
+/* minihtml defaults <ol> to bullets, so numbering has to be asked for. */
+ol {{ margin-top: 0; margin-bottom: {s}px; padding-left: {s}px; list-style-type: decimal; }}
+ul ul {{ list-style-type: circle; }}
+ul ul ul {{ list-style-type: square; }}
+/* Ordered lists are divs, not <ol>: minihtml draws a bullet for <ol> and
+   ignores list-style-type, so there is no way to suppress it on a real list. */
+.ord {{ margin-bottom: {s}px; }}
+.ord-item {{ padding-left: {s}px; margin-bottom: 3px; }}
+.tight .ord-item {{ margin-bottom: 0; }}
+.num {{ color: {muted}; font-family: {code_font}; }}
 li {{ margin-bottom: 3px; }}
 .tight li {{ margin-bottom: 0; }}
+.tight {{ margin-bottom: {s}px; }}
 
 .hr {{
     border-bottom: 1px solid {rule};

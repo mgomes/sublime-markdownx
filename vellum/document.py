@@ -32,13 +32,17 @@ def render(view, text, settings=None):
     html, state = md.parse(body)
 
     theme = Theme(view, settings)
+    width = settings.get("page_width")
+    style = ' style="width: %dpx;"' % width if width else ""
+
     document = (
         "<body id=vellum>"
         "<style>%s</style>"
-        "%s%s"
+        '<div class="page"%s>%s%s</div>'
         "</body>"
     ) % (
         theme.css(),
+        style,
         _front_matter_block(front_matter, settings.get("show_front_matter", True)),
         html,
     )

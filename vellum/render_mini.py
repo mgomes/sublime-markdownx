@@ -46,6 +46,35 @@ def spaces(text):
     return escape(text).replace(" ", "&nbsp;")
 
 
+def _strip_tag(html, tag):
+    """Remove one enclosing `tag` from `html` if it wraps the whole fragment."""
+    opening = "<%s>" % tag
+    closing = "</%s>" % tag
+    if html.startswith(opening) and html.endswith(closing):
+        return html[len(opening) : -len(closing)]
+    return html
+
+
+def _unwrap_first_paragraph(html):
+    """Turn a leading ``<p>`` into an inline span.
+
+    A list item's content is a block, so a marker rendered before it would sit
+    alone on its own line. Paragraphs never nest, so the first ``</p>`` closes
+    the first ``<p>`` and both can be swapped for inline equivalents.
+    """
+    if not html.startswith("<p"):
+        return html
+
+    open_end = html.find(">")
+    close_at = html.find("</p>")
+    if open_end == -1 or close_at == -1:
+        return html
+
+    inner = html[open_end + 1 : close_at]
+    rest = html[close_at + len("</p>") :]
+    return "<span>%s</span>%s" % (inner, rest)
+
+
 class MiniHtmlRenderer(BaseRenderer):
     """Token renderer targeting Sublime's minihtml."""
 
@@ -58,6 +87,7 @@ class MiniHtmlRenderer(BaseRenderer):
         self.settings = settings or {}
         self.tab_size = self.settings.get("tab_size", 4)
         self.table_width = self.settings.get("table_max_width", 100)
+        self.code_width = self.settings.get("code_max_width")
         self.show_line_numbers = self.settings.get("code_line_numbers", False)
         self.anchors = []
 
@@ -201,19 +231,24 @@ class MiniHtmlRenderer(BaseRenderer):
         )
 
     def _code_lines(self, lines, pre_rendered=False):
-        """Join code lines, optionally numbering them in a padded gutter."""
+        """Join code lines, numbering and soft-wrapping them as configured."""
         if not pre_rendered:
             lines = [spaces(line) for line in lines]
 
-        if not self.show_line_numbers:
-            return "<br>".join(lines)
+        gutter_width = len(str(len(lines))) if self.show_line_numbers else 0
+        wrap_at = self.code_width
+        if wrap_at:
+            wrap_at = max(20, wrap_at - gutter_width - 2)
 
-        width = len(str(len(lines)))
-        numbered = []
+        out = []
         for index, line in enumerate(lines, 1):
-            gutter = str(index).rjust(width).replace(" ", "&nbsp;")
-            numbered.append('<span class="ln">%s&nbsp;&nbsp;</span>%s' % (gutter, line))
-        return "<br>".join(numbered)
+            if wrap_at:
+                line = code_mod.wrap_line(line, wrap_at)
+            if gutter_width:
+                number = str(index).rjust(gutter_width).replace(" ", "&nbsp;")
+                line = '<span class="ln">%s&nbsp;&nbsp;</span>%s' % (number, line)
+            out.append(line)
+        return "<br>".join(out)
 
     def _placeholder(self, kind, raw, token):
         """A card standing in for content only the browser target can render."""
@@ -231,15 +266,39 @@ class MiniHtmlRenderer(BaseRenderer):
 
     def list(self, token, state):
         attrs = token.get("attrs", {})
-        tag = "ol" if attrs.get("ordered") else "ul"
-        cls = ' class="tight"' if token.get("tight") else ""
-        return "<%s%s%s>%s</%s>" % (
-            tag,
-            cls,
-            self._anchor(token),
-            self.render_tokens(token["children"], state),
-            tag,
-        )
+        classes = ["tight"] if token.get("tight") else []
+
+        if not attrs.get("ordered"):
+            cls = ' class="%s"' % " ".join(classes) if classes else ""
+            return "<ul%s%s>%s</ul>" % (
+                cls,
+                self._anchor(token),
+                self.render_tokens(token["children"], state),
+                )
+
+        # minihtml ignores `list-style-type` -- an <ol> draws the same bullet as
+        # a <ul> and `none` does not suppress it -- so ordered lists are built
+        # from divs and number themselves. Counting here also honours a list
+        # that starts at something other than one.
+        start = int(attrs.get("start") or 1)
+        items = token["children"]
+        width = len(str(start + len(items) - 1))
+
+        rendered = []
+        for offset, item in enumerate(items):
+            marker = ("%d." % (start + offset)).rjust(width + 1).replace(" ", "&nbsp;")
+            body = self.render_token(item, state)
+            body = _strip_tag(body, "li")
+            # The marker has to sit inside the item's first paragraph, or that
+            # paragraph starts a new line and leaves the number stranded.
+            body = _unwrap_first_paragraph(body)
+            rendered.append(
+                '<div class="ord-item"><span class="num">%s</span>&nbsp;%s</div>'
+                % (marker, body)
+            )
+
+        cls = "ord tight" if token.get("tight") else "ord"
+        return '<div class="%s"%s>%s</div>' % (cls, self._anchor(token), "".join(rendered))
 
     def list_item(self, token, state):
         return "<li>%s</li>" % self.render_tokens(token["children"], state)
