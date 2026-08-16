@@ -61,6 +61,9 @@ ALIASES = {
 #: target shows a placeholder for these; the browser target renders them.
 NON_CODE_INFO = ("mermaid", "math", "katex", "latex")
 
+#: Labels for which Plain Text is the right answer rather than a failed lookup.
+PLAIN_TEXT_INFO = ("text", "txt", "plain", "plaintext", "")
+
 PANEL_PREFIX = "markdownx.code."
 
 _syntax_cache = {}
@@ -75,7 +78,7 @@ def normalize_info(info):
     """
     if not info:
         return ""
-    return re.split(r"[\s,{:]", info.strip(), 1)[0].strip().lower()
+    return re.split(r"[\s,{:]", info.strip(), maxsplit=1)[0].strip().lower()
 
 
 def find_syntax(lang):
@@ -104,6 +107,17 @@ def find_syntax(lang):
             # Sublime names are title-cased far more often than not.
             matches = sublime.find_syntax_by_name(lang.capitalize())
         syntax = matches[0] if matches else None
+
+    if syntax is None and lang:
+        # Fences are commonly labelled with a file extension rather than the
+        # syntax name -- ```vibe, ```cr, ```rs. Sublime already maps extensions
+        # to syntaxes, so asking it beats keeping a table in step by hand, and
+        # it picks up any syntax the user installs later.
+        guess = sublime.find_syntax_for_file("untitled." + lang)
+        # Unknown extensions come back as Plain Text rather than None, which
+        # would otherwise mask a genuinely unrecognised language.
+        if guess is not None and (guess.scope != "text.plain" or lang in PLAIN_TEXT_INFO):
+            syntax = guess
 
     _syntax_cache[lang] = syntax if syntax is not None else _missing
     return syntax
