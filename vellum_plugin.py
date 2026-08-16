@@ -6,10 +6,14 @@ the package directory, which would make ``Vellum.vellum`` ambiguous between this
 module and that package.
 """
 
+import os
+
 import sublime
 import sublime_plugin
 
+from .vellum import browser
 from .vellum import code as code_mod
+from .vellum import export as export_mod
 from .vellum import surface
 
 SETTINGS_FILE = "Vellum.sublime-settings"
@@ -44,7 +48,7 @@ def plugin_loaded():
 
 def _on_settings_changed():
     """Re-render every open preview so font and layout edits apply at once."""
-    for preview in surface.all_previews():
+    for preview in surface.all_previews() + browser.all_previews():
         if preview.alive():
             preview.settings = render_settings(preview.source)
             preview.render()
@@ -56,6 +60,8 @@ def plugin_unloaded():
     settings().clear_on_change("vellum")
     for preview in surface.all_previews():
         preview.close()
+    # Stops the HTTP server too, once its last session is gone.
+    browser.close_all()
 
 
 def settings():
@@ -98,6 +104,12 @@ def _watch_viewports(epoch):
         else:
             surface.forget(preview.source.buffer_id())
 
+    for preview in browser.all_previews():
+        if preview.alive():
+            preview.sync_scroll()
+        else:
+            browser.forget(preview.source.buffer_id())
+
     sublime.set_timeout(lambda: _watch_viewports(epoch), surface.SYNC_POLL_MS)
 
 
@@ -112,6 +124,52 @@ class VellumPreviewCommand(sublime_plugin.TextCommand):
             return
 
         surface.open_for(self.view, render_settings(self.view))
+
+    def is_enabled(self):
+        return is_markdown(self.view)
+
+    def is_visible(self):
+        return is_markdown(self.view)
+
+
+class VellumPreviewBrowserCommand(sublime_plugin.TextCommand):
+    """Open a live browser preview, with diagrams and math rendered."""
+
+    def run(self, edit):
+        browser.open_for(self.view, render_settings(self.view))
+
+    def is_enabled(self):
+        return is_markdown(self.view)
+
+    def is_visible(self):
+        return is_markdown(self.view)
+
+
+class VellumExportCommand(sublime_plugin.TextCommand):
+    """Write the document to a single self-contained HTML file."""
+
+    def run(self, edit):
+        view = self.view
+        source = view.file_name()
+        default = os.path.splitext(source)[0] + ".html" if source else ""
+
+        def write(path):
+            if not path:
+                return
+            text = view.substr(sublime.Region(0, view.size()))
+            title = os.path.basename(path)
+            try:
+                html = export_mod.standalone(title, text, render_settings(view))
+                with open(path, "w", encoding="utf-8") as handle:
+                    handle.write(html)
+            except Exception as error:
+                sublime.error_message("Vellum export failed:\n%s" % error)
+                return
+
+            size = os.path.getsize(path)
+            sublime.status_message("Vellum: exported %s (%d KB)" % (path, size // 1024))
+
+        view.window().show_input_panel("Export to:", default, write, None, None)
 
     def is_enabled(self):
         return is_markdown(self.view)
@@ -136,20 +194,20 @@ class VellumRefreshCommand(sublime_plugin.TextCommand):
 
 class VellumEventListener(sublime_plugin.EventListener):
     def on_modified_async(self, view):
-        preview = surface.get(view)
-        if preview:
+        for preview in _previews_for(view):
             preview.schedule()
 
     def on_post_save_async(self, view):
-        preview = surface.get(view)
-        if preview:
+        for preview in _previews_for(view):
             preview.render()
 
     def on_pre_close(self, view):
-        preview = surface.get(view)
-        if preview:
-            preview.close()
+        if _previews_for(view):
+            pane = surface.get(view)
+            if pane:
+                pane.close()
             surface.forget(view.buffer_id())
+            browser.forget(view.buffer_id())
             return
 
         # Closing the preview pane itself unregisters the pairing.
@@ -159,3 +217,8 @@ class VellumEventListener(sublime_plugin.EventListener):
     def on_load_async(self, view):
         if is_markdown(view) and settings().get("auto_open", False):
             surface.open_for(view, render_settings(view))
+
+
+def _previews_for(view):
+    """Every live preview following `view`, in either target."""
+    return [p for p in (surface.get(view), browser.get(view)) if p is not None]
