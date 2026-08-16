@@ -1,0 +1,6 @@
+[
+    { "caption": "-", "id": "vellum" },
+    { "caption": "Preview in Sublime", "command": "vellum_preview" },
+    { "caption": "Preview in Browser", "command": "vellum_preview_browser" },
+    { "caption": "Export to HTML", "command": "vellum_export" }
+]

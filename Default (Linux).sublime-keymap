@@ -1,0 +1,16 @@
+[
+    {
+        "keys": ["ctrl+shift+m"],
+        "command": "vellum_preview",
+        "context": [
+            { "key": "selector", "operand": "text.html.markdown, source.gfm" }
+        ]
+    },
+    {
+        "keys": ["ctrl+shift+alt+m"],
+        "command": "vellum_preview_browser",
+        "context": [
+            { "key": "selector", "operand": "text.html.markdown, source.gfm" }
+        ]
+    }
+]

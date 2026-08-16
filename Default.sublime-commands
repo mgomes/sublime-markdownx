@@ -1,0 +1,26 @@
+[
+    {
+        "caption": "Vellum: Preview in Sublime",
+        "command": "vellum_preview"
+    },
+    {
+        "caption": "Vellum: Preview in Browser",
+        "command": "vellum_preview_browser"
+    },
+    {
+        "caption": "Vellum: Export to HTML",
+        "command": "vellum_export"
+    },
+    {
+        "caption": "Vellum: Refresh Preview",
+        "command": "vellum_refresh"
+    },
+    {
+        "caption": "Preferences: Vellum Settings",
+        "command": "edit_settings",
+        "args": {
+            "base_file": "${packages}/Vellum/Vellum.sublime-settings",
+            "default": "{\n\t$0\n}\n"
+        }
+    }
+]

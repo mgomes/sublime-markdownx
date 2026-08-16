@@ -1,0 +1,46 @@
+{
+    // Open a preview automatically whenever a markdown file is loaded.
+    "auto_open": false,
+
+    // Scroll the preview to follow the editor. Sublime has no scroll event, so
+    // this samples the editor viewport ten times a second while a preview is
+    // open; turn it off if you would rather scroll the panes independently.
+    "scroll_sync": true,
+
+    // Widest a table may be, in characters. minihtml cannot scroll
+    // horizontally, so tables past this width lose cells from their widest
+    // column, ending in an ellipsis, rather than wrapping.
+    "table_max_width": 100,
+
+    // Number the lines of fenced code blocks.
+    "code_line_numbers": false,
+
+    // Show YAML front matter as a metadata block instead of hiding it.
+    "show_front_matter": true,
+
+    // -- Fonts ---------------------------------------------------------
+    //
+    // Two faces are used. "code_font" is the monospace one, covering fenced
+    // code, inline code, tables and ordered-list markers -- everything whose
+    // alignment depends on every character being the same width. "body_font"
+    // is the proportional one used for prose, headings and lists.
+    //
+    // Both accept any installed family name. Give a family that is not
+    // installed and Sublime falls back to a default face, so check your
+    // spelling if a change appears to do nothing.
+
+    // Monospace face. Defaults to the editor's own "font_face", so fenced code
+    // in the preview matches fenced code in the buffer.
+    // "code_font": "MonoLisaCode",
+
+    // Proportional face. Defaults to "system", the UI font.
+    // "body_font": "Helvetica Neue",
+
+    // Body text size in pixels. Defaults to the editor's font size plus one,
+    // because proportional text reads smaller than monospace at equal size.
+    // "font_size": 13,
+
+    // Monospace size in pixels. Defaults to 92% of "font_size", which keeps
+    // code visually level with the prose around it.
+    // "code_font_size": 12,
+}
