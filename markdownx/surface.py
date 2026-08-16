@@ -16,6 +16,12 @@ from . import document
 SOURCE_ID = "markdownx_source_id"
 IS_PREVIEW = "markdownx_preview"
 
+#: Set on a window whose split this plugin created, so the split can be undone
+#: when the preview closes without disturbing one the user arranged themselves.
+SPLIT_CREATED = "markdownx_created_split"
+
+SINGLE_COLUMN = {"cols": [0.0, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1]]}
+
 #: How long to wait after the last keystroke before re-rendering.
 DEBOUNCE_MS = 120
 
@@ -196,9 +202,12 @@ class Preview:
         return self.view.is_valid() and self.source.is_valid()
 
     def close(self):
-        if self.view.is_valid():
-            self.view.set_scratch(True)
-            self.view.close()
+        if not self.view.is_valid():
+            return
+        window = self.view.window()
+        self.view.set_scratch(True)
+        self.view.close()
+        collapse_split(window)
 
 
 # -- module level --------------------------------------------------------
@@ -304,6 +313,25 @@ def _ensure_split(window, source):
             "rows": [0.0, 1.0],
             "cells": [[0, 0, 1, 1], [1, 0, 2, 1]],
         })
+        window.settings().set(SPLIT_CREATED, True)
 
     source_group = window.get_view_index(source)[0]
     return 1 if source_group == 0 else 0
+
+
+def collapse_split(window):
+    """Undo the split this plugin created, once its group has emptied.
+
+    Without this, closing a preview leaves a dead half-window behind. Only a
+    split the plugin made is undone, and only while it holds nothing else, so a
+    layout the user arranged is never disturbed.
+    """
+    if window is None or not window.settings().get(SPLIT_CREATED):
+        return
+    if window.num_groups() != 2:
+        return
+    if all(window.views_in_group(group) for group in range(2)):
+        return
+
+    window.run_command("set_layout", SINGLE_COLUMN)
+    window.settings().erase(SPLIT_CREATED)

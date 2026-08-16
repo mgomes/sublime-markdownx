@@ -213,6 +213,10 @@ class MarkdownxEventListener(sublime_plugin.EventListener):
         # Closing the preview pane itself unregisters the pairing.
         if view.settings().get(surface.IS_PREVIEW):
             surface.forget(view.settings().get(surface.SOURCE_ID))
+            # The view is still open at this point, so the group only looks
+            # empty on the next tick.
+            window = view.window()
+            sublime.set_timeout(lambda: surface.collapse_split(window), 0)
 
     def on_load_async(self, view):
         if is_markdown(view) and settings().get("auto_open", False):
