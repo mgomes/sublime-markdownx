@@ -1,10 +1,10 @@
 ---
 title: Kitchen Sink
-author: Vellum
+author: MarkdownX
 tags: [markdown, preview]
 ---
 
-# Vellum kitchen sink
+# MarkdownX kitchen sink
 
 Every construct the preview is expected to handle, in one document. If something
 regresses, it shows up here first.
@@ -58,11 +58,11 @@ Task list:
 
 Left, right and centre alignment:
 
-| Package  | Downloads | Status |
-|:---------|----------:|:------:|
-| vellum   |     1,204 |   ok   |
-| mistune  |   980,000 |   ok   |
-| minihtml |         0 |  n/a   |
+| Package   | Downloads | Status |
+|:----------|----------:|:------:|
+| markdownx |     1,204 |   ok   |
+| mistune   |   980,000 |   ok   |
+| minihtml  |         0 |  n/a   |
 
 A table with wide characters, which must stay aligned:
 
@@ -133,7 +133,7 @@ def fib(n: int) -> list[int]:
 JSON, JavaScript, and shell:
 
 ```json
-{"name": "vellum", "version": "0.1.0", "private": true, "count": 42}
+{"name": "markdownx", "version": "0.1.0", "private": true, "count": 42}
 ```
 
 ```js
@@ -190,8 +190,8 @@ Below the rule.
 
 ## Definition list
 
-Vellum
-: A fine parchment made from calfskin.
+MarkdownX
+: A live markdown preview for Sublime Text.
 
 minihtml
 : Sublime Text's restricted HTML subset.

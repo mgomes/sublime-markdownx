@@ -285,7 +285,7 @@ def ensure_running():
             # Port 0 asks the OS for a free port, so nothing can collide.
             _server = _Server(("127.0.0.1", 0), _Handler)
             thread = threading.Thread(
-                target=_server.serve_forever, name="vellum-http", daemon=True
+                target=_server.serve_forever, name="markdownx-http", daemon=True
             )
             thread.start()
         return _server

@@ -13,8 +13,8 @@ import sublime
 from . import document
 
 #: Marker settings key identifying a preview view and the buffer it follows.
-SOURCE_ID = "vellum_source_id"
-IS_PREVIEW = "vellum_preview"
+SOURCE_ID = "markdownx_source_id"
+IS_PREVIEW = "markdownx_preview"
 
 #: How long to wait after the last keystroke before re-rendering.
 DEBOUNCE_MS = 120
@@ -23,7 +23,7 @@ DEBOUNCE_MS = 120
 #: scroll event, so following the editor means sampling its viewport.
 SYNC_POLL_MS = 100
 
-PHANTOM_KEY = "vellum"
+PHANTOM_KEY = "markdownx"
 
 #: Room left for the vertical scrollbar when sizing the page.
 _SCROLLBAR_ALLOWANCE = 16
@@ -99,7 +99,7 @@ class Preview:
         except Exception as error:
             import traceback
 
-            print("[vellum] render failed:\n" + traceback.format_exc())
+            print("[markdownx] render failed:\n" + traceback.format_exc())
             html = document.render_error(self.source, str(error), traceback.format_exc()[-800:])
             anchors = []
 
@@ -206,9 +206,9 @@ class Preview:
 
 def on_navigate(href):
     """Handle links clicked inside a preview."""
-    if href == "vellum:browser":
+    if href == "markdownx:browser":
         window = sublime.active_window()
-        window.run_command("vellum_preview_browser")
+        window.run_command("markdownx_preview_browser")
     elif href.startswith(("http://", "https://")):
         import webbrowser
 

@@ -1,6 +1,6 @@
 """Tests for soft-wrapping highlighted code lines.
 
-``vellum.code`` imports sublime at module scope, so the two functions under test
+``markdownx.code`` imports sublime at module scope, so the two functions under test
 are loaded from source into a bare module instead.
 """
 
@@ -15,7 +15,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def _load_wrap_module():
     """Load just the markup helpers from code.py, without importing sublime."""
-    source = open(os.path.join(ROOT, "vellum", "code.py"), encoding="utf-8").read()
+    source = open(os.path.join(ROOT, "markdownx", "code.py"), encoding="utf-8").read()
     wanted = ("def _tokenize", "def wrap_line", "def split_lines")
 
     chunks = []

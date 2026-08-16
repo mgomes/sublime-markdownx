@@ -5,7 +5,7 @@ without a human clicking through the UI. This module polls a request file for a
 JSON payload, evaluates it on the main thread, and writes the result back to a
 response file, so the whole plugin can be exercised from a shell script.
 
-It is not loaded in normal use: ``vellum.py`` never imports it, and it does
+It is not loaded in normal use: ``markdownx.py`` never imports it, and it does
 nothing unless ``VELLUM_PROBE_DIR`` exists on disk.
 """
 
@@ -16,15 +16,19 @@ import traceback
 import sublime
 import sublime_plugin
 
-PROBE_DIR = os.path.expanduser("~/.vellum-probe")
+PROBE_DIR = os.path.expanduser("~/.markdownx-probe")
 REQUEST = os.path.join(PROBE_DIR, "request.json")
 RESPONSE = os.path.join(PROBE_DIR, "response.json")
 POLL_MS = 250
 
-_last_seen = None
+#: Nonce of the last request executed. Requests carry an id rather than being
+#: identified by mtime, because reloading the plugin resets this module's state
+#: and an mtime-based check would then re-run the request that triggered it.
+_last_id = None
 
 
-def _respond(payload):
+def _respond(payload, request_id=None):
+    payload = dict(payload, id=request_id)
     tmp = RESPONSE + ".tmp"
     with open(tmp, "w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=1, default=repr)
@@ -67,26 +71,27 @@ def _run(source, finish):
 
 
 def _poll():
-    global _last_seen
+    global _last_id
 
     if os.path.isdir(PROBE_DIR) and os.path.exists(REQUEST):
+        request = None
         try:
-            stamp = os.path.getmtime(REQUEST)
-        except OSError:
-            stamp = None
+            with open(REQUEST, encoding="utf-8") as handle:
+                request = json.load(handle)
+        except (OSError, ValueError):
+            pass  # Half-written request; it will be complete next tick.
 
-        if stamp is not None and stamp != _last_seen:
-            _last_seen = stamp
+        if request is not None and request.get("id") != _last_id:
+            request_id = request.get("id")
+            _last_id = request_id
             try:
-                with open(REQUEST, encoding="utf-8") as handle:
-                    request = json.load(handle)
-                _run(request["source"], _respond)
+                _run(request["source"], lambda p: _respond(p, request_id))
             except Exception:
-                _respond({"ok": False, "error": traceback.format_exc()})
+                _respond({"ok": False, "error": traceback.format_exc()}, request_id)
 
     sublime.set_timeout(_poll, POLL_MS)
 
 
 def plugin_loaded():
-    print("[vellum-probe] watching", REQUEST)
+    print("[markdownx-probe] watching", REQUEST)
     sublime.set_timeout(_poll, POLL_MS)

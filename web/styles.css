@@ -1,4 +1,4 @@
-/* Vellum browser preview.
+/* MarkdownX browser preview.
  *
  * GitHub-like typography in both schemes. Colours are declared once as custom
  * properties so the theme toggle only has to swap a data attribute.
@@ -305,11 +305,11 @@ tbody tr:nth-child(2n) { background: var(--stripe); }
 }
 
 /* Briefly tints the block the editor just scrolled to. */
-@keyframes vellum-flash {
+@keyframes markdownx-flash {
     from { background-color: var(--stripe); }
     to { background-color: transparent; }
 }
-.flash { animation: vellum-flash 1s ease-out; }
+.flash { animation: markdownx-flash 1s ease-out; }
 
 @media (max-width: 900px) {
     .toc { display: none; }

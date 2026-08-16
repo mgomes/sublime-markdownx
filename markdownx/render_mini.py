@@ -258,7 +258,7 @@ class MiniHtmlRenderer(BaseRenderer):
             '<span class="note-title">%s</span><br>'
             "<code>&nbsp;%s&nbsp;</code><br>"
             '<span class="note-hint">Not renderable in Sublime -- </span>'
-            '<a href="vellum:browser">open preview in browser</a>'
+            '<a href="markdownx:browser">open preview in browser</a>'
             "</div>"
         ) % (self._anchor(token), escape(kind), spaces(first[:80]))
 

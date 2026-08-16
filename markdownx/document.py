@@ -36,7 +36,7 @@ def render(view, text, settings=None):
     style = ' style="width: %dpx;"' % width if width else ""
 
     document = (
-        "<body id=vellum>"
+        "<body id=markdownx>"
         "<style>%s</style>"
         '<div class="page"%s>%s%s</div>'
         "</body>"
@@ -57,7 +57,7 @@ def render_error(view, message, detail=""):
     body = '<span class="note-title">Preview failed</span><br>%s' % escape(message)
     if detail:
         body += '<br><br><span class="note-hint">%s</span>' % spaces(detail)
-    return '<body id=vellum><style>%s</style><div class="note">%s</div></body>' % (
+    return '<body id=markdownx><style>%s</style><div class="note">%s</div></body>' % (
         theme.css(),
         body,
     )

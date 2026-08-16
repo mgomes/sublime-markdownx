@@ -1,25 +1,25 @@
 [
     {
-        "caption": "Vellum: Preview in Sublime",
-        "command": "vellum_preview"
+        "caption": "MarkdownX: Preview in Sublime",
+        "command": "markdownx_preview"
     },
     {
-        "caption": "Vellum: Preview in Browser",
-        "command": "vellum_preview_browser"
+        "caption": "MarkdownX: Preview in Browser",
+        "command": "markdownx_preview_browser"
     },
     {
-        "caption": "Vellum: Export to HTML",
-        "command": "vellum_export"
+        "caption": "MarkdownX: Export to HTML",
+        "command": "markdownx_export"
     },
     {
-        "caption": "Vellum: Refresh Preview",
-        "command": "vellum_refresh"
+        "caption": "MarkdownX: Refresh Preview",
+        "command": "markdownx_refresh"
     },
     {
-        "caption": "Preferences: Vellum Settings",
+        "caption": "Preferences: MarkdownX Settings",
         "command": "edit_settings",
         "args": {
-            "base_file": "${packages}/Vellum/Vellum.sublime-settings",
+            "base_file": "${packages}/MarkdownX/MarkdownX.sublime-settings",
             "default": "{\n\t$0\n}\n"
         }
     }

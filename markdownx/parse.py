@@ -146,6 +146,11 @@ def _resolve_lines(tokens, src):
             token["line"] = bisect_right(starts, pos) - 1
 
 
+def _resolve_lines_hook(md, state):
+    """Resolve offsets before rendering, so renderers can read ``line``."""
+    _resolve_lines(state.tokens, state.src)
+
+
 def split_front_matter(text):
     """Return ``(front_matter_or_None, remaining_text, lines_consumed)``."""
     match = FRONT_MATTER_RE.match(text)
@@ -181,6 +186,10 @@ def create_parser(renderer):
         _parse_inline_math,
         before="link",
     )
+
+    # Runs between parsing and rendering, so a renderer sees resolved line
+    # numbers rather than raw character offsets.
+    md.before_render_hooks.append(_resolve_lines_hook)
     return md
 
 
@@ -194,8 +203,7 @@ def parse_tokens(text):
     front_matter, body, offset = split_front_matter(text)
 
     md = create_parser(None)
-    tokens, state = md.parse(body)
-    _resolve_lines(tokens, state.src)
+    tokens, _state = md.parse(body)
 
     if offset:
         for token in tokens:

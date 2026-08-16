@@ -1,4 +1,4 @@
-/* Vellum browser preview client.
+/* MarkdownX browser preview client.
  *
  * Receives rendered HTML over server-sent events, then highlights code, renders
  * math and diagrams, and keeps scrolling in step with the editor.

@@ -49,7 +49,7 @@ class BrowserPreview:
             )
             html = result["html"]
         except Exception:
-            print("[vellum] browser render failed:\n" + traceback.format_exc())
+            print("[markdownx] browser render failed:\n" + traceback.format_exc())
             html = '<div class="error">%s</div>' % traceback.format_exc()
 
         self.session.update(html)

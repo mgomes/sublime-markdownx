@@ -6,7 +6,7 @@ import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from vellum.tables import (  # noqa: E402
+from markdownx.tables import (  # noqa: E402
     layout,
     pad,
     solve_widths,

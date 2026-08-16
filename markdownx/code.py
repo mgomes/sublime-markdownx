@@ -61,7 +61,7 @@ ALIASES = {
 #: target shows a placeholder for these; the browser target renders them.
 NON_CODE_INFO = ("mermaid", "math", "katex", "latex")
 
-PANEL_PREFIX = "vellum.code."
+PANEL_PREFIX = "markdownx.code."
 
 _syntax_cache = {}
 _missing = object()
@@ -115,8 +115,8 @@ def _panel_for(window, syntax, tab_size):
     panel = window.create_output_panel(key, unlisted=True)
 
     settings = panel.settings()
-    if not settings.get("vellum_initialised"):
-        settings.set("vellum_initialised", True)
+    if not settings.get("markdownx_initialised"):
+        settings.set("markdownx_initialised", True)
         settings.set("gutter", False)
         settings.set("rulers", [])
         settings.set("word_wrap", False)

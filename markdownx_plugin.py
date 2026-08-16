@@ -1,8 +1,8 @@
-"""Vellum -- a live markdown preview for Sublime Text.
+"""MarkdownX -- a live markdown preview for Sublime Text.
 
 Entry point: commands, event listeners, and settings plumbing. Rendering lives
-in the ``vellum`` package. The file is named for the plugin rather than matching
-the package directory, which would make ``Vellum.vellum`` ambiguous between this
+in the ``markdownx`` package. The file is named for the plugin rather than matching
+the package directory, which would make ``MarkdownX.markdownx`` ambiguous between this
 module and that package.
 """
 
@@ -11,12 +11,12 @@ import os
 import sublime
 import sublime_plugin
 
-from .vellum import browser
-from .vellum import code as code_mod
-from .vellum import export as export_mod
-from .vellum import surface
+from .markdownx import browser
+from .markdownx import code as code_mod
+from .markdownx import export as export_mod
+from .markdownx import surface
 
-SETTINGS_FILE = "Vellum.sublime-settings"
+SETTINGS_FILE = "MarkdownX.sublime-settings"
 
 #: Selector identifying buffers this plugin will preview.
 MARKDOWN_SELECTOR = "text.html.markdown, text.html.markdown.multimarkdown, source.gfm"
@@ -43,7 +43,7 @@ def plugin_loaded():
     global _watch_epoch
     _watch_epoch += 1
     sublime.set_timeout(lambda: _watch_viewports(_watch_epoch), surface.SYNC_POLL_MS)
-    settings().add_on_change("vellum", _on_settings_changed)
+    settings().add_on_change("markdownx", _on_settings_changed)
 
 
 def _on_settings_changed():
@@ -57,7 +57,7 @@ def _on_settings_changed():
 def plugin_unloaded():
     global _watch_epoch
     _watch_epoch += 1
-    settings().clear_on_change("vellum")
+    settings().clear_on_change("markdownx")
     for preview in surface.all_previews():
         preview.close()
     # Stops the HTTP server too, once its last session is gone.
@@ -113,7 +113,7 @@ def _watch_viewports(epoch):
     sublime.set_timeout(lambda: _watch_viewports(epoch), surface.SYNC_POLL_MS)
 
 
-class VellumPreviewCommand(sublime_plugin.TextCommand):
+class MarkdownxPreviewCommand(sublime_plugin.TextCommand):
     """Toggle the in-editor preview pane for the current markdown file."""
 
     def run(self, edit):
@@ -132,7 +132,7 @@ class VellumPreviewCommand(sublime_plugin.TextCommand):
         return is_markdown(self.view)
 
 
-class VellumPreviewBrowserCommand(sublime_plugin.TextCommand):
+class MarkdownxPreviewBrowserCommand(sublime_plugin.TextCommand):
     """Open a live browser preview, with diagrams and math rendered."""
 
     def run(self, edit):
@@ -145,7 +145,7 @@ class VellumPreviewBrowserCommand(sublime_plugin.TextCommand):
         return is_markdown(self.view)
 
 
-class VellumExportCommand(sublime_plugin.TextCommand):
+class MarkdownxExportCommand(sublime_plugin.TextCommand):
     """Write the document to a single self-contained HTML file."""
 
     def run(self, edit):
@@ -163,11 +163,11 @@ class VellumExportCommand(sublime_plugin.TextCommand):
                 with open(path, "w", encoding="utf-8") as handle:
                     handle.write(html)
             except Exception as error:
-                sublime.error_message("Vellum export failed:\n%s" % error)
+                sublime.error_message("MarkdownX export failed:\n%s" % error)
                 return
 
             size = os.path.getsize(path)
-            sublime.status_message("Vellum: exported %s (%d KB)" % (path, size // 1024))
+            sublime.status_message("MarkdownX: exported %s (%d KB)" % (path, size // 1024))
 
         view.window().show_input_panel("Export to:", default, write, None, None)
 
@@ -178,7 +178,7 @@ class VellumExportCommand(sublime_plugin.TextCommand):
         return is_markdown(self.view)
 
 
-class VellumRefreshCommand(sublime_plugin.TextCommand):
+class MarkdownxRefreshCommand(sublime_plugin.TextCommand):
     """Force a re-render, discarding cached syntax lookups."""
 
     def run(self, edit):
@@ -192,7 +192,7 @@ class VellumRefreshCommand(sublime_plugin.TextCommand):
         return surface.get(self.view) is not None
 
 
-class VellumEventListener(sublime_plugin.EventListener):
+class MarkdownxEventListener(sublime_plugin.EventListener):
     def on_modified_async(self, view):
         for preview in _previews_for(view):
             preview.schedule()
