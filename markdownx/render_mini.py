@@ -135,9 +135,7 @@ class MiniHtmlRenderer(BaseRenderer):
         return '<img src="%s">' % escape(self._resolve(attrs.get("url", "")))
 
     def codespan(self, token, state):
-        # Thin spaces pad the background box; minihtml ignores horizontal
-        # padding on inline elements.
-        return "<code>&nbsp;%s&nbsp;</code>" % spaces(token["raw"])
+        return "<code>%s</code>" % spaces(token["raw"])
 
     def linebreak(self, token, state):
         return "<br>"
@@ -164,7 +162,7 @@ class MiniHtmlRenderer(BaseRenderer):
         return "<span>_%s</span>" % self.render_tokens(token["children"], state)
 
     def inline_math(self, token, state):
-        return '<code>&nbsp;%s&nbsp;</code>' % spaces(token["raw"])
+        return "<code>%s</code>" % spaces(token["raw"])
 
     def abbr(self, token, state):
         return self.render_tokens(token["children"], state)

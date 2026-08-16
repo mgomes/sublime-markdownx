@@ -216,13 +216,16 @@ li {{ margin-bottom: 3px; }}
     margin-bottom: {s}px;
 }}
 
-/* Inline code. No padding-x on inline elements in minihtml, so the background
-   is nudged out with thin spaces instead. */
+/* Horizontal padding on an inline element is honoured, so the background box
+   does not need padding faked with spaces -- which would indent any paragraph
+   that begins with inline code. */
 code {{
     font-family: {code_font};
     font-size: {code_size}px;
     background-color: {code_bg};
     color: {fg};
+    padding: 0 5px;
+    border-radius: 3px;
 }}
 
 .code {{
@@ -260,6 +263,10 @@ blockquote {{
     border-radius: 4px;
 }}
 .tr {{ padding-left: 6px; padding-right: 6px; }}
+/* Column widths are computed in character cells from the cell's plain text, so
+   anything inside a cell that adds pixels of its own would push the column out
+   of alignment. */
+.table code {{ padding: 0; background-color: transparent; }}
 .th {{
     font-weight: bold;
     background-color: {header_bg};
