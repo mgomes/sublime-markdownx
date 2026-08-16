@@ -23,6 +23,33 @@ VENDOR = os.path.join(WEB_ROOT, "vendor")
 #: Rewritten to data URIs when KaTeX's stylesheet is inlined.
 FONT_URL_RE = re.compile(r"url\(fonts/([A-Za-z0-9_-]+\.woff2)\)")
 
+#: Fence names that highlight.js treats as aliases. An alias resolves only once
+#: its grammar is registered, so it has to be mapped to the module defining it.
+#: Kept in step with LANGUAGE_ALIASES in web/app.js.
+LANGUAGE_ALIASES = {
+    "console": "shell",
+    "shell-session": "shell",
+    "shellsession": "shell",
+    "html": "xml",
+    "xhtml": "xml",
+    "svg": "xml",
+    "yml": "yaml",
+    "docker": "dockerfile",
+    "make": "makefile",
+    "mk": "makefile",
+    "objc": "objectivec",
+    "obj-c": "objectivec",
+    "ps": "powershell",
+    "ps1": "powershell",
+    "ex": "elixir",
+    "exs": "elixir",
+    "cr": "crystal",
+    "hs": "haskell",
+    "clj": "clojure",
+    "tex": "latex",
+    "fs": "fsharp",
+}
+
 
 def _read(*parts):
     with open(os.path.join(*parts), encoding="utf-8") as handle:
@@ -61,6 +88,22 @@ def _shift_lines(html, offset):
     )
 
 
+def _modules_for(languages):
+    """Vendored grammar modules needed for `languages`, deduplicated.
+
+    Names already covered by the common bundle have no module on disk and are
+    skipped; so is anything genuinely unknown, which then renders unhighlighted.
+    """
+    wanted = []
+    for name in languages:
+        module = LANGUAGE_ALIASES.get(name, name)
+        if module in wanted:
+            continue
+        if os.path.exists(os.path.join(VENDOR, "languages", "%s.min.js" % module)):
+            wanted.append(module)
+    return wanted
+
+
 def _inline_katex_css():
     """KaTeX's stylesheet with its woff2 faces embedded as data URIs."""
     css = _read(VENDOR, "katex.min.css")
@@ -91,10 +134,8 @@ def standalone(title, text, settings=None):
 
     # highlight.js's common bundle covers about forty languages; anything else
     # has its own module, and only the ones this document uses are inlined.
-    for name in result["languages"]:
-        module = os.path.join(VENDOR, "languages", "%s.min.js" % name)
-        if os.path.exists(module):
-            scripts.append(_read(module))
+    for name in _modules_for(result["languages"]):
+        scripts.append(_read(VENDOR, "languages", "%s.min.js" % name))
 
     if result["uses_math"]:
         parts.append(_inline_katex_css())

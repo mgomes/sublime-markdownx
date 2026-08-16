@@ -56,6 +56,33 @@
      stays small without giving up coverage. */
   var languageLoads = {};
 
+  /* Fence names that are aliases in highlight.js. An alias only resolves once
+     its grammar is registered, so the loader has to map it to the module that
+     defines it -- looking for console.min.js would just 404. */
+  var LANGUAGE_ALIASES = {
+    console: "shell",
+    "shell-session": "shell",
+    shellsession: "shell",
+    html: "xml",
+    xhtml: "xml",
+    svg: "xml",
+    yml: "yaml",
+    docker: "dockerfile",
+    make: "makefile",
+    mk: "makefile",
+    objc: "objectivec",
+    "obj-c": "objectivec",
+    ps: "powershell",
+    ps1: "powershell",
+    ex: "elixir",
+    exs: "elixir",
+    cr: "crystal",
+    hs: "haskell",
+    clj: "clojure",
+    tex: "latex",
+    fs: "fsharp",
+  };
+
   function loadLanguage(name) {
     if (languageLoads[name]) return languageLoads[name];
     languageLoads[name] = new Promise(function (resolve) {
@@ -77,7 +104,8 @@
       var match = /language-([A-Za-z0-9#+_-]+)/.exec(block.className);
       if (!match) return;
       var name = match[1].toLowerCase();
-      if (!window.hljs.getLanguage(name)) wanted[name] = true;
+      if (window.hljs.getLanguage(name)) return;
+      wanted[LANGUAGE_ALIASES[name] || name] = true;
     });
 
     var names = Object.keys(wanted);
