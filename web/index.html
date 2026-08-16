@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} &middot; Vellum</title>
+<link rel="stylesheet" href="/static/styles.css?token={{TOKEN}}">
+<link rel="stylesheet" href="/vendor/hljs-light.css?token={{TOKEN}}" media="(prefers-color-scheme: light)">
+<link rel="stylesheet" href="/vendor/hljs-dark.css?token={{TOKEN}}" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="/vendor/katex.min.css?token={{TOKEN}}">
+</head>
+<body data-token="{{TOKEN}}" data-doc="{{DOC}}">
+
+<header class="bar">
+  <span class="title">{{TITLE}}</span>
+  <span class="status" id="status" title="Connection to Sublime Text"></span>
+  <nav class="actions">
+    <button type="button" id="toggle-toc" title="Toggle contents">Contents</button>
+    <button type="button" id="toggle-sync" title="Scroll with the editor" class="on">Sync</button>
+    <button type="button" id="toggle-theme" title="Light or dark">Theme</button>
+  </nav>
+</header>
+
+<div class="layout">
+  <aside class="toc" id="toc" hidden></aside>
+  <main class="markdown-body" id="content"></main>
+</div>
+
+<script src="/vendor/highlight.min.js?token={{TOKEN}}"></script>
+<script src="/vendor/katex.min.js?token={{TOKEN}}"></script>
+<script src="/static/app.js?token={{TOKEN}}"></script>
+</body>
+</html>
