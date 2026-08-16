@@ -13,6 +13,18 @@ find "$DIR/.." -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
 
 PROBE_TIMEOUT=30 "$DIR/probe.sh" '
 import sys, sublime_plugin, traceback
+
+# Shut the HTTP server down before dropping the modules. Purging sys.modules
+# skips plugin_unloaded, and the server thread would then keep its port with
+# nothing left referencing it -- one orphan listener per reload.
+try:
+    from MarkdownX.markdownx import browser, surface
+    for _p in surface.all_previews():
+        _p.close()
+    browser.close_all()
+except Exception:
+    pass
+
 stale = sorted(m for m in sys.modules if m == "MarkdownX" or m.startswith("MarkdownX."))
 for name in stale:
     del sys.modules[name]
