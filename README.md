@@ -4,8 +4,8 @@ MarkdownX adds live Markdown preview to Sublime Text 4. Use a native split pane
 for everyday editing, or open a browser view for full tables, Mermaid diagrams,
 KaTeX math, and a document outline.
 
-Both previews update as you type and follow the editor's scroll position. Their
-rendering libraries are bundled, so MarkdownX does not send your document to a
+Both previews update as you type and follow the editor's scroll position. Everything
+needed for the preview is included, so MarkdownX does not send your document to a
 remote service.
 
 ## Install from GitHub
@@ -48,23 +48,20 @@ Two more commands are available from the Command Palette:
 
 | Capability | Sublime pane | Browser |
 |:--|:--|:--|
-| Code fences | installed Sublime syntaxes and the current colour scheme | bundled highlight.js with light and dark themes |
+| Code fences | installed Sublime syntaxes and the current color scheme | bundled highlight.js with light and dark themes |
 | Tables | aligned monospace columns, capped to the pane width | native HTML tables with horizontal overflow |
 | Mermaid and math | source placeholder with a link to the browser | rendered with Mermaid and KaTeX |
 | Navigation | editor-to-pane scroll sync | two-way scroll sync and a contents sidebar |
-| Local server | none | token-protected loopback server, started on demand |
+| Local server | none | local only, started on demand |
 
-Sublime's in-editor HTML dialect, minihtml, has no table layout, `<pre>` block,
-or JavaScript engine. MarkdownX parses the document once, then renders it for
-each target so the pane can stay lightweight while the browser handles the
-features that need full HTML and JavaScript.
+Use the Sublime pane for quick feedback while you write. Use the browser when you
+need diagrams, math, wide tables, or the contents sidebar.
 
-Fenced code in the pane passes through `View.export_to_html`, so highlighting
-matches the active colour scheme and uses every syntax package installed in
-Sublime. The browser uses the bundled highlight.js grammars instead.
+Code fences in the pane use Sublime's own syntax highlighting, so they match the
+code in your editor. The browser uses bundled highlight.js grammars.
 
-The pane never opens a port. A browser preview starts a token-protected server
-bound to `127.0.0.1`; the server stops after the last previewed document closes.
+The pane never opens a port. The browser preview runs locally on `127.0.0.1` and
+closes its server after the last previewed document closes.
 
 ## Supported Markdown
 
