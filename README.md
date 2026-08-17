@@ -1,12 +1,11 @@
 # MarkdownX
 
-MarkdownX adds live Markdown preview to Sublime Text 4. Use a native split pane
-for everyday editing, or open a browser view for full tables, Mermaid diagrams,
-KaTeX math, and a document outline.
+MarkdownX shows a live preview of your Markdown in Sublime Text 4. You can show
+the preview next to the file or open it in a browser. The browser view adds full
+tables, Mermaid diagrams, math, and a table of contents.
 
-Both previews update as you type and follow the editor's scroll position. Everything
-needed for the preview is included, so MarkdownX does not send your document to a
-remote service.
+Both views update as you type. All preview libraries are included with the
+package. Your document is not sent to a remote service.
 
 ## Install from GitHub
 
@@ -20,55 +19,53 @@ MarkdownX requires Sublime Text build 4092 or newer.
    git clone https://github.com/mgomes/sublime-markdownx.git MarkdownX
    ```
 
-Sublime Text loads the package as soon as the clone finishes. MarkdownX has no
-external runtime dependencies. Markdown parsing uses a vendored copy of
-[Mistune](https://github.com/lepture/mistune) (BSD-3-Clause); highlight.js,
-Mermaid, KaTeX, and their required assets are bundled too.
+Sublime Text loads the package after the clone finishes. The package includes
+all of its runtime libraries. Markdown parsing uses [Mistune](https://github.com/lepture/mistune)
+(BSD-3-Clause). highlight.js, Mermaid, and KaTeX are included as well.
 
 ## Preview a document
 
-Open a Markdown file and use either preview command:
+Open a Markdown file and use one of these commands:
 
 | Command | macOS | Linux and Windows |
 |:--|:--|:--|
 | MarkdownX: Preview in Sublime | `Cmd+Shift+M` | `Ctrl+Shift+M` |
 | MarkdownX: Preview in Browser | `Cmd+Shift+Option+M` | `Ctrl+Shift+Alt+M` |
 
-The first command toggles a preview pane beside the current buffer. The second
-opens the document in your browser. Both commands are also available from the
-Command Palette and the Markdown context menu.
+The first command opens or closes the preview pane. The second opens the
+document in your browser. You can also find both commands in the Command Palette
+and the Markdown context menu.
 
-Two more commands are available from the Command Palette:
+Two more commands are available in the Command Palette:
 
-- **MarkdownX: Export to HTML** writes the rendered document to an `.html` file.
-- **MarkdownX: Refresh Preview** clears cached syntax lookups and redraws the
-  Sublime pane.
+- **MarkdownX: Export to HTML** saves the document as an `.html` file.
+- **MarkdownX: Refresh Preview** reloads the Sublime preview.
 
 ## Preview options
 
-| Capability | Sublime pane | Browser |
+| Feature | Sublime pane | Browser |
 |:--|:--|:--|
-| Code fences | installed Sublime syntaxes and the current color scheme | bundled highlight.js with light and dark themes |
-| Tables | aligned monospace columns, capped to the pane width | native HTML tables with horizontal overflow |
-| Mermaid and math | source placeholder with a link to the browser | rendered with Mermaid and KaTeX |
-| Navigation | editor-to-pane scroll sync | two-way scroll sync and a contents sidebar |
-| Local server | none | local only, started on demand |
+| Code fences | Sublime syntax highlighting and the current color scheme | bundled highlight.js |
+| Tables | aligned text; long cells are shortened | full HTML tables |
+| Mermaid and math | source with a link to the browser | rendered |
+| Scrolling | editor to pane | both directions |
+| Server | none | local only, started when needed |
 
-Use the Sublime pane for quick feedback while you write. Use the browser when you
-need diagrams, math, wide tables, or the contents sidebar.
+Use the Sublime pane for quick feedback while you write. Use the browser when
+you need diagrams, math, wide tables, or the table of contents.
 
-Code fences in the pane use Sublime's own syntax highlighting, so they match the
-code in your editor. The browser uses bundled highlight.js grammars.
+Code fences in the pane use the same syntax highlighting as your editor. The
+browser uses its own bundled highlighting.
 
-The pane never opens a port. The browser preview runs locally on `127.0.0.1` and
-closes its server after the last previewed document closes.
+The browser preview runs only on your computer. It stops when you close the last
+previewed document.
 
 ## Supported Markdown
 
-MarkdownX parses CommonMark and adds:
+MarkdownX supports standard Markdown plus:
 
-- GitHub-style tables with alignment, task lists, strikethrough, URL autolinks,
-  and footnotes.
+- GitHub-style tables with alignment, task lists, strikethrough, plain URLs that
+  become links, and footnotes.
 - Definition lists and abbreviations.
 - `==highlight==`, `^^insertion^^`, `H~2~O`, and `x^2^` inline formatting.
 - YAML front matter.
@@ -76,24 +73,24 @@ MarkdownX parses CommonMark and adds:
 - KaTeX math written as `$inline$` or `$$block$$`, including GitHub's
   single-line `$$…$$` form.
 
-The Sublime pane keeps Mermaid and math source visible as a placeholder; follow
-its link to render the construct in the browser.
+In the Sublime pane, Mermaid and math show their source with a link to the
+browser. The browser renders them.
 
-## Export a portable HTML file
+## Export to HTML
 
-**MarkdownX: Export to HTML** writes one file with MarkdownX's styles and scripts
-inlined. When math is present, it also inlines KaTeX's fonts. A plain document is
-about 140 KB, one with math is about 785 KB, and one with Mermaid is about 3.7
-MB; feature-specific assets are included only when the document needs them.
+**MarkdownX: Export to HTML** saves one file with the styles and scripts needed
+to display the preview. Math adds KaTeX and its fonts. Mermaid adds Mermaid.
 
-Document images and linked files are not embedded. Keep relative assets beside
-the exported file when moving it, or use URLs that remain reachable.
+A plain document is about 140 KB. A document with math is about 785 KB. A
+document with Mermaid is about 3.7 MB.
+
+Images and linked files are not copied into the HTML file. Keep local files next
+to the exported file, or use URLs that will remain available.
 
 ## Customize the Sublime pane
 
-Open `Preferences → Package Settings → MarkdownX → Settings`. Every option is
-documented in the [default settings](./MarkdownX.sublime-settings); a typical
-override looks like this:
+Open `Preferences → Package Settings → MarkdownX → Settings`. The [default
+settings](./MarkdownX.sublime-settings) file describes every option.
 
 ```json
 {
@@ -108,10 +105,10 @@ override looks like this:
 }
 ```
 
-`auto_open` opens the Sublime pane whenever a Markdown file loads. Font and line
-number settings affect that pane; by default, code follows the editor font and
-prose uses the system UI font. The browser has its own light and dark theme
-toggle.
+`auto_open` opens the pane when a Markdown file loads. `scroll_sync` keeps the
+editor and preview aligned. The font settings control the pane. By default, code
+uses the editor font and prose uses the system font. The browser has its own
+light and dark theme button.
 
 ## Develop and verify
 
@@ -121,11 +118,11 @@ dev/reload.sh
 dev/probe.sh 'report(build=sublime.version())'
 ```
 
-The offline test suite covers parsing, table layout, and code wrapping. Sublime
-Text exposes no command-line interface for plugin commands, so `dev/probe.sh`
-sends a Python snippet to a running editor and prints the reported values. The
-script creates `~/.markdownx-probe`; remove that directory to disable the bridge.
+The tests run without a network connection. They check Markdown parsing, table
+layout, and code wrapping. Sublime has no command-line tool for plugin commands,
+so `dev/probe.sh` sends a small Python command to a running editor and prints the
+result. The script creates `~/.markdownx-probe`; remove that directory to turn it
+off.
 
-[`tests/fixtures/kitchen-sink.md`](./tests/fixtures/kitchen-sink.md) exercises
-every supported construct in one document and is the fastest visual regression
-check for both render targets.
+[`tests/fixtures/kitchen-sink.md`](./tests/fixtures/kitchen-sink.md) contains
+every supported construct. It is the quickest visual test for both previews.
