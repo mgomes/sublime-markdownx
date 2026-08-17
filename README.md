@@ -44,7 +44,7 @@ Two more commands are available from the Command Palette:
 - **MarkdownX: Refresh Preview** clears cached syntax lookups and redraws the
   Sublime pane.
 
-## The pane stays native; the browser adds full HTML
+## Preview options
 
 | Capability | Sublime pane | Browser |
 |:--|:--|:--|
@@ -55,9 +55,9 @@ Two more commands are available from the Command Palette:
 | Local server | none | token-protected loopback server, started on demand |
 
 Sublime's in-editor HTML dialect, minihtml, has no table layout, `<pre>` block,
-or JavaScript engine. MarkdownX therefore parses the document once and renders
-it separately for each target instead of forcing one compromised representation
-onto both.
+or JavaScript engine. MarkdownX parses the document once, then renders it for
+each target so the pane can stay lightweight while the browser handles the
+features that need full HTML and JavaScript.
 
 Fenced code in the pane passes through `View.export_to_html`, so highlighting
 matches the active colour scheme and uses every syntax package installed in
