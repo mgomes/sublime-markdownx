@@ -1,63 +1,109 @@
 # MarkdownX
 
-A live markdown preview for Sublime Text 4, with GitHub tables, syntax-highlighted
-code fences, and two render targets.
+MarkdownX adds live Markdown preview to Sublime Text 4. Use a native split pane
+for everyday editing, or open a browser view for full tables, Mermaid diagrams,
+KaTeX math, and a document outline.
 
-`cmd+shift+m` opens a preview pane beside the buffer that updates as you type.
-`cmd+shift+alt+m` opens the same document in a browser, where diagrams and math
-render too.
+Both previews update as you type and follow the editor's scroll position. Their
+rendering libraries are bundled, so MarkdownX does not send your document to a
+remote service.
 
-## The two targets
+## Install from GitHub
 
-Sublime's in-editor HTML dialect, minihtml, implements no table layout, no
-`<pre>`, and no JavaScript engine. So the pane and the browser get separate
-renderers over one shared parse, each playing to what its surface can do.
+MarkdownX requires Sublime Text build 4092 or newer.
 
-| | Preview in Sublime | Preview in Browser |
+1. In Sublime Text, choose `Preferences → Browse Packages…`.
+2. Open a terminal in the directory that appears.
+3. Clone this repository into a directory named `MarkdownX`:
+
+   ```bash
+   git clone https://github.com/mgomes/sublime-markdownx.git MarkdownX
+   ```
+
+Sublime Text loads the package as soon as the clone finishes. MarkdownX has no
+external runtime dependencies. Markdown parsing uses a vendored copy of
+[Mistune](https://github.com/lepture/mistune) (BSD-3-Clause); highlight.js,
+Mermaid, KaTeX, and their required assets are bundled too.
+
+## Preview a document
+
+Open a Markdown file and use either preview command:
+
+| Command | macOS | Linux and Windows |
 |:--|:--|:--|
-| Surface | pane beside the buffer | browser tab |
-| Code fences | Sublime's own syntax engine, in your colour scheme | highlight.js, GitHub theme |
-| Tables | aligned monospace columns, header rule, zebra striping | real `<table>` |
-| Mermaid | placeholder linking to the browser | rendered |
-| Math | placeholder linking to the browser | rendered with KaTeX |
-| Live update | as you type | as you type |
-| Scroll sync | editor to pane | both ways |
-| Network | none, no port opened | loopback only, started on demand |
+| MarkdownX: Preview in Sublime | `Cmd+Shift+M` | `Ctrl+Shift+M` |
+| MarkdownX: Preview in Browser | `Cmd+Shift+Option+M` | `Ctrl+Shift+Alt+M` |
 
-The pane is the default and never opens a port. The HTTP server starts only when
-you open a browser preview and stops when the last one closes.
+The first command toggles a preview pane beside the current buffer. The second
+opens the document in your browser. Both commands are also available from the
+Command Palette and the Markdown context menu.
 
-Fenced code in the pane goes through `View.export_to_html`, so it is coloured by
-whatever colour scheme you already use, across every syntax Sublime has installed
-— including ones highlight.js does not ship, like Crystal.
+Two more commands are available from the Command Palette:
 
-## Commands
+- **MarkdownX: Export to HTML** writes the rendered document to an `.html` file.
+- **MarkdownX: Refresh Preview** clears cached syntax lookups and redraws the
+  Sublime pane.
 
-| Command | Binding |
-|:--|:--|
-| MarkdownX: Preview in Sublime | `cmd+shift+m` |
-| MarkdownX: Preview in Browser | `cmd+shift+alt+m` |
-| MarkdownX: Export to HTML | — |
-| MarkdownX: Refresh Preview | — |
+## The pane stays native; the browser adds full HTML
 
-Export writes a single self-contained `.html` file with all CSS and JavaScript
-inlined. Mermaid and KaTeX are embedded only when the document uses them, so an
-ordinary document exports at around 140 KB rather than 4 MB.
+| Capability | Sublime pane | Browser |
+|:--|:--|:--|
+| Code fences | installed Sublime syntaxes and the current colour scheme | bundled highlight.js with light and dark themes |
+| Tables | aligned monospace columns, capped to the pane width | native HTML tables with horizontal overflow |
+| Mermaid and math | source placeholder with a link to the browser | rendered with Mermaid and KaTeX |
+| Navigation | editor-to-pane scroll sync | two-way scroll sync and a contents sidebar |
+| Local server | none | token-protected loopback server, started on demand |
 
-## Markdown support
+Sublime's in-editor HTML dialect, minihtml, has no table layout, `<pre>` block,
+or JavaScript engine. MarkdownX therefore parses the document once and renders
+it separately for each target instead of forcing one compromised representation
+onto both.
 
-CommonMark plus the GitHub extensions: tables with alignment, task lists,
-strikethrough, autolinks, footnotes, definition lists, highlight, superscript and
-subscript, and YAML front matter. Math is written as `$inline$` and `$$block$$`,
-including the single-line `$$…$$` form GitHub accepts.
+Fenced code in the pane passes through `View.export_to_html`, so highlighting
+matches the active colour scheme and uses every syntax package installed in
+Sublime. The browser uses the bundled highlight.js grammars instead.
 
-## Settings
+The pane never opens a port. A browser preview starts a token-protected server
+bound to `127.0.0.1`; the server stops after the last previewed document closes.
 
-`Preferences → Package Settings → MarkdownX → Settings`. Every option is
-documented in the default file; the ones most people want are the two fonts:
+## Supported Markdown
+
+MarkdownX parses CommonMark and adds:
+
+- GitHub-style tables with alignment, task lists, strikethrough, URL autolinks,
+  and footnotes.
+- Definition lists and abbreviations.
+- `==highlight==`, `^^insertion^^`, `H~2~O`, and `x^2^` inline formatting.
+- YAML front matter.
+- Mermaid diagrams in fenced `mermaid` blocks.
+- KaTeX math written as `$inline$` or `$$block$$`, including GitHub's
+  single-line `$$…$$` form.
+
+The Sublime pane keeps Mermaid and math source visible as a placeholder; follow
+its link to render the construct in the browser.
+
+## Export a portable HTML file
+
+**MarkdownX: Export to HTML** writes one file with MarkdownX's styles and scripts
+inlined. When math is present, it also inlines KaTeX's fonts. A plain document is
+about 140 KB, one with math is about 785 KB, and one with Mermaid is about 3.7
+MB; feature-specific assets are included only when the document needs them.
+
+Document images and linked files are not embedded. Keep relative assets beside
+the exported file when moving it, or use URLs that remain reachable.
+
+## Customize the Sublime pane
+
+Open `Preferences → Package Settings → MarkdownX → Settings`. Every option is
+documented in the [default settings](./MarkdownX.sublime-settings); a typical
+override looks like this:
 
 ```json
 {
+    "auto_open": true,
+    "scroll_sync": true,
+    "table_max_width": 100,
+    "code_line_numbers": true,
     "code_font": "MonoLisaCode",
     "body_font": "Helvetica Neue",
     "font_size": 15,
@@ -65,38 +111,24 @@ documented in the default file; the ones most people want are the two fonts:
 }
 ```
 
-`code_font` is the monospace face, used for fenced code, inline code, tables and
-list markers — everything whose alignment depends on a fixed character width.
-`body_font` is the proportional face for prose. Both default to following the
-editor: code uses your `font_face`, body uses the UI font.
+`auto_open` opens the Sublime pane whenever a Markdown file loads. Font and line
+number settings affect that pane; by default, code follows the editor font and
+prose uses the system UI font. The browser has its own light and dark theme
+toggle.
 
-## Installing
-
-The package has no dependencies. Clone it into your Packages directory, or clone
-it anywhere and symlink:
+## Develop and verify
 
 ```bash
-git clone https://github.com/YOURNAME/sublime-markdownx.git
-ln -s "$PWD/sublime-markdownx" \
-  "$HOME/Library/Application Support/Sublime Text/Packages/MarkdownX"
+python3 -m unittest discover -s tests -t .
+dev/reload.sh
+dev/probe.sh 'report(build=sublime.version())'
 ```
 
-Requires Sublime Text build 4092 or newer, which is where `export_to_html`
-arrived. Markdown parsing uses a vendored copy of
-[mistune](https://github.com/lepture/mistune) (BSD-3-Clause).
+The offline test suite covers parsing, table layout, and code wrapping. Sublime
+Text exposes no command-line interface for plugin commands, so `dev/probe.sh`
+sends a Python snippet to a running editor and prints the reported values. The
+script creates `~/.markdownx-probe`; remove that directory to disable the bridge.
 
-## Development
-
-```bash
-python3 -m unittest discover -s tests -t .   # parsing, tables, wrapping
-dev/reload.sh                                # reload inside a running Sublime
-dev/probe.sh 'report(x=sublime.version())'   # run a snippet in the plugin host
-```
-
-Sublime exposes no CLI for running plugin commands, which makes behaviour hard to
-check without clicking through the UI. `dev/probe.sh` sends a Python snippet to
-the running editor and prints what it reports, so the plugin can be exercised
-from a script. It is inert unless `~/.markdownx-probe` exists.
-
-`tests/fixtures/kitchen-sink.md` exercises every supported construct in one
-document and is the fastest way to spot a regression in either target.
+[`tests/fixtures/kitchen-sink.md`](./tests/fixtures/kitchen-sink.md) exercises
+every supported construct in one document and is the fastest visual regression
+check for both render targets.
