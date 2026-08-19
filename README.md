@@ -7,6 +7,11 @@ tables, Mermaid diagrams, math, and a table of contents.
 Both views update as you type. All preview libraries are included with the
 package. Your document is not sent to a remote service.
 
+![Sublime Text showing a Markdown file on the left and the MarkdownX preview
+pane on the right, with a table and highlighted Go code](./docs/images/sublime-pane-dark.png)
+
+*The Sublime pane: source on the left, preview on the right.*
+
 ## Install from GitHub
 
 MarkdownX requires Sublime Text build 4092 or newer.
@@ -53,6 +58,16 @@ Two more commands are available in the Command Palette:
 
 Use the Sublime pane for quick feedback while you write. Use the browser when
 you need diagrams, math, wide tables, or the table of contents.
+
+![The browser preview showing the table of contents, a task list, a table, and
+a highlighted Go code block](./docs/images/browser-light.png)
+
+*The browser preview, with the table of contents open.*
+
+![The same document in the browser dark theme, with a Mermaid flowchart and two
+KaTeX equations rendered](./docs/images/browser-dark.png)
+
+*Further down the same document: Mermaid and math, in the dark theme.*
 
 Code fences in the pane use the same syntax highlighting as your editor. The
 browser uses its own bundled highlighting.
@@ -110,6 +125,11 @@ editor and preview aligned. The font settings control the pane. By default, code
 uses the editor font and prose uses the system font. The browser has its own
 light and dark theme button.
 
+![The same file previewed in Sublime Text with a light color
+scheme](./docs/images/sublime-pane-light.png)
+
+*The pane takes its colors from your editor color scheme.*
+
 ## Develop and verify
 
 ```bash
@@ -126,3 +146,5 @@ off.
 
 [`tests/fixtures/kitchen-sink.md`](./tests/fixtures/kitchen-sink.md) contains
 every supported construct. It is the quickest visual test for both previews.
+[`docs/demo.md`](./docs/demo.md) is the shorter document in the screenshots
+above.
