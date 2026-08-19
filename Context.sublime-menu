@@ -1,5 +1,4 @@
 [
-    { "caption": "-", "id": "markdownx" },
     { "caption": "Preview in Sublime", "command": "markdownx_preview" },
     { "caption": "Preview in Browser", "command": "markdownx_preview_browser" },
     { "caption": "Export to HTML", "command": "markdownx_export" }
