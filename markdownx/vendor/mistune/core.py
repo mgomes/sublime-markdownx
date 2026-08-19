@@ -21,7 +21,10 @@ from typing import (
 if sys.version_info >= (3, 11):
     from typing import Self
 else:
-    from typing_extensions import Self
+    # Vendoring change: upstream imports Self from typing_extensions, which
+    # Sublime's 3.8 plugin host does not ship. Self appears only in an
+    # annotation, so the TypeVar it replaced before 3.11 stands in for it.
+    Self = TypeVar("Self")
 
 _LINE_END = re.compile(r"\n|$")
 

@@ -30,16 +30,23 @@ all of its runtime libraries. Markdown parsing uses [Mistune](https://github.com
 
 ## Preview a document
 
-Open a Markdown file and use one of these commands:
+Open a Markdown file and run one of these from the Command Palette:
+
+- **MarkdownX: Preview in Sublime** opens or closes the preview pane.
+- **MarkdownX: Preview in Browser** opens the document in your browser.
+
+Both also appear in the Markdown context menu.
+
+MarkdownX binds no keys, so it cannot take them from another package. The
+keymap that ships with the package lists two suggestions, commented out:
 
 | Command | macOS | Linux and Windows |
 |:--|:--|:--|
 | MarkdownX: Preview in Sublime | `Cmd+Shift+M` | `Ctrl+Shift+M` |
 | MarkdownX: Preview in Browser | `Cmd+Shift+Option+M` | `Ctrl+Shift+Alt+M` |
 
-The first command opens or closes the preview pane. The second opens the
-document in your browser. You can also find both commands in the Command Palette
-and the Markdown context menu.
+To use one, open `Preferences → Package Settings → MarkdownX → Key Bindings`
+and copy it into your own keymap.
 
 Two more commands are available in the Command Palette:
 

@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # 3.8 is Sublime Text 4's plugin host. The runner has no third-party
+      # modules installed, which is also what the host looks like, so an
+      # accidental dependency fails here instead of on a user's machine.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - run: python -m unittest discover -s tests -t .

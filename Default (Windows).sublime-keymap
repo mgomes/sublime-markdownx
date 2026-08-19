@@ -1,16 +1,19 @@
+// MarkdownX binds no keys, so it cannot take them from another package.
+// To use these, copy one into your own keymap:
+// Preferences > Package Settings > MarkdownX > Key Bindings.
 [
-    {
-        "keys": ["ctrl+shift+m"],
-        "command": "markdownx_preview",
-        "context": [
-            { "key": "selector", "operand": "text.html.markdown, source.gfm" }
-        ]
-    },
-    {
-        "keys": ["ctrl+shift+alt+m"],
-        "command": "markdownx_preview_browser",
-        "context": [
-            { "key": "selector", "operand": "text.html.markdown, source.gfm" }
-        ]
-    }
+    // {
+    //     "keys": ["ctrl+shift+m"],
+    //     "command": "markdownx_preview",
+    //     "context": [
+    //         { "key": "selector", "operand": "text.html.markdown, source.gfm" }
+    //     ]
+    // },
+    // {
+    //     "keys": ["ctrl+shift+alt+m"],
+    //     "command": "markdownx_preview_browser",
+    //     "context": [
+    //         { "key": "selector", "operand": "text.html.markdown, source.gfm" }
+    //     ]
+    // }
 ]
