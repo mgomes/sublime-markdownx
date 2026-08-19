@@ -1,0 +1,20 @@
+MarkdownX for Sublime Text
+==========================
+
+Thanks for installing! MarkdownX shows a live preview of your Markdown,
+either next to the file or in a browser. The browser view adds full
+tables, Mermaid diagrams, math, and a table of contents.
+
+Open a Markdown file and run one of these from the Command Palette:
+
+    MarkdownX: Preview in Sublime
+    MarkdownX: Preview in Browser
+    MarkdownX: Export to HTML
+
+Settings live under Preferences > Package Settings > MarkdownX.
+
+Everything the preview needs is bundled, and your document is never sent
+to a remote service. The browser preview runs a server on your own
+machine and stops when you close the last previewed document.
+
+Docs and issues: https://github.com/mgomes/sublime-markdownx
