@@ -37,16 +37,16 @@ Open a Markdown file and run one of these from the Command Palette:
 
 Both also appear in the Markdown context menu.
 
-MarkdownX binds no keys, so it cannot take them from another package. The
-keymap that ships with the package lists two suggestions, commented out:
+MarkdownX binds no keys, so it cannot take them from another package. It
+suggests two:
 
 | Command | macOS | Linux and Windows |
 |:--|:--|:--|
 | MarkdownX: Preview in Sublime | `Cmd+Shift+M` | `Ctrl+Shift+M` |
 | MarkdownX: Preview in Browser | `Cmd+Shift+Option+M` | `Ctrl+Shift+Alt+M` |
 
-To use one, open `Preferences → Package Settings → MarkdownX → Key Bindings`
-and copy it into your own keymap.
+To use one, open `Preferences → Package Settings → MarkdownX → Example Key
+Bindings` and copy it into your own keymap, which opens beside it.
 
 Two more commands are available in the Command Palette:
 
