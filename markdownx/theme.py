@@ -135,7 +135,31 @@ class Theme:
     def css(self):
         """Return the stylesheet for a preview document."""
         s = self.size
+        heads = {
+            "h1": int(s * 1.9),
+            "h2": int(s * 1.55),
+            "h3": int(s * 1.3),
+            "h4": int(s * 1.12),
+            "h5": s,
+        }
+        # minihtml has no em units, so the space above a heading is worked out
+        # from that level's own size. Below stays tight so a heading reads as
+        # attached to the text it introduces.
+        #
+        # h1 is the exception. minihtml supports neither `:first-child` nor
+        # child combinators -- a rule using either is not ignored, it aborts
+        # the parse and drops every rule after it -- so the title of a document
+        # cannot have its leading margin removed once set. Since an h1 nearly
+        # always opens the document, it keeps a small gap that does not stack
+        # into dead space under the page padding.
+        leading = {"h1": 0.6, "h2": 1.7, "h3": 1.6, "h4": 1.5, "h5": 1.45}
+        gaps = {
+            "gap_" + name: max(4, int(size * leading[name]))
+            for name, size in heads.items()
+        }
         return CSS_TEMPLATE.format(
+            head_gap_below=max(6, int(s * 0.5)),
+            **gaps,
             bg=self.bg,
             fg=self.fg,
             muted=self.muted,
@@ -153,11 +177,8 @@ class Theme:
             code_font=self.code_font,
             body_font=self.body_font,
             s=s,
-            h1=int(s * 1.9),
-            h2=int(s * 1.55),
-            h3=int(s * 1.3),
-            h4=int(s * 1.12),
             small=max(9, int(s * 0.85)),
+            **heads,
             code_size=self.code_size,
         )
 
@@ -170,7 +191,7 @@ body {{
     color: {fg};
     font-family: {body_font};
     font-size: {s}px;
-    line-height: 1.6;
+    line-height: 1.8;
 }}
 
 /* A block phantom sizes itself to its content and never wraps, so a long
@@ -183,15 +204,14 @@ a {{ color: {link}; text-decoration: none; }}
 
 h1, h2, h3, h4, h5, h6 {{
     font-weight: bold;
-    line-height: 1.25;
-    margin-top: {s}px;
-    margin-bottom: 6px;
+    line-height: 1.3;
+    margin-bottom: {head_gap_below}px;
 }}
-h1 {{ font-size: {h1}px; border-bottom: 2px solid {rule}; padding-bottom: 5px; }}
-h2 {{ font-size: {h2}px; border-bottom: 1px solid {rule}; padding-bottom: 4px; }}
-h3 {{ font-size: {h3}px; }}
-h4 {{ font-size: {h4}px; }}
-h5, h6 {{ font-size: {s}px; color: {muted}; }}
+h1 {{ font-size: {h1}px; margin-top: {gap_h1}px; border-bottom: 2px solid {rule}; padding-bottom: 5px; }}
+h2 {{ font-size: {h2}px; margin-top: {gap_h2}px; border-bottom: 1px solid {rule}; padding-bottom: 4px; }}
+h3 {{ font-size: {h3}px; margin-top: {gap_h3}px; }}
+h4 {{ font-size: {h4}px; margin-top: {gap_h4}px; }}
+h5, h6 {{ font-size: {s}px; margin-top: {gap_h5}px; color: {muted}; }}
 
 p {{ margin-top: 0; margin-bottom: {s}px; }}
 
