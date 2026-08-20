@@ -1,0 +1,39 @@
+// Example key bindings for MarkdownX. Sublime Text never loads this file, so
+// MarkdownX claims no keys of its own. Copy the pair for your platform into
+// your own keymap, on the right, to use them.
+//
+// The context limits each binding to Markdown files, so it takes the key only
+// where MarkdownX can act on it.
+[
+    // macOS
+    {
+        "keys": ["super+shift+m"],
+        "command": "markdownx_preview",
+        "context": [
+            { "key": "selector", "operand": "text.html.markdown, source.gfm" }
+        ]
+    },
+    {
+        "keys": ["super+shift+alt+m"],
+        "command": "markdownx_preview_browser",
+        "context": [
+            { "key": "selector", "operand": "text.html.markdown, source.gfm" }
+        ]
+    },
+
+    // Linux and Windows
+    {
+        "keys": ["ctrl+shift+m"],
+        "command": "markdownx_preview",
+        "context": [
+            { "key": "selector", "operand": "text.html.markdown, source.gfm" }
+        ]
+    },
+    {
+        "keys": ["ctrl+shift+alt+m"],
+        "command": "markdownx_preview_browser",
+        "context": [
+            { "key": "selector", "operand": "text.html.markdown, source.gfm" }
+        ]
+    }
+]

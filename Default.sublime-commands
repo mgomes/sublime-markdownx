@@ -22,5 +22,13 @@
             "base_file": "${packages}/MarkdownX/MarkdownX.sublime-settings",
             "default": "{\n\t$0\n}\n"
         }
+    },
+    {
+        "caption": "Preferences: MarkdownX Example Key Bindings",
+        "command": "edit_settings",
+        "args": {
+            "base_file": "${packages}/MarkdownX/Example.sublime-keymap",
+            "user_file": "${packages}/User/Default (${platform}).sublime-keymap"
+        }
     }
 ]
