@@ -1,0 +1,17 @@
+[
+    {
+        "caption": "Preview in Sublime",
+        "command": "markdownx_tab",
+        "args": { "action": "markdownx_preview", "group": -1, "index": -1 }
+    },
+    {
+        "caption": "Preview in Browser",
+        "command": "markdownx_tab",
+        "args": { "action": "markdownx_preview_browser", "group": -1, "index": -1 }
+    },
+    {
+        "caption": "Export to HTML",
+        "command": "markdownx_tab",
+        "args": { "action": "markdownx_export", "group": -1, "index": -1 }
+    }
+]

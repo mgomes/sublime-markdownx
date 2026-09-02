@@ -192,6 +192,37 @@ class MarkdownxRefreshCommand(sublime_plugin.TextCommand):
         return surface.get(self.view) is not None
 
 
+class MarkdownxTabCommand(sublime_plugin.WindowCommand):
+    """Run one of the text commands against a tab, for the tab context menu.
+
+    Right-clicking a tab does not focus it, so a text command placed in that
+    menu would act on whatever view happened to be active. Sublime substitutes
+    the clicked tab's position for `group` and `index` when a menu entry passes
+    -1 for them, which is what identifies the intended view here. Builds that
+    leave the sentinels in place fall back to the active view, matching what
+    the entry would have done anyway.
+    """
+
+    def run(self, action, group=-1, index=-1):
+        view = self._target(group, index)
+        if view is not None:
+            view.run_command(action)
+
+    def is_visible(self, action, group=-1, index=-1):
+        return is_markdown(self._target(group, index))
+
+    def is_enabled(self, action, group=-1, index=-1):
+        return is_markdown(self._target(group, index))
+
+    def _target(self, group, index):
+        if group >= 0 and index >= 0:
+            views = self.window.views_in_group(group)
+            if index < len(views):
+                return views[index]
+            return None
+        return self.window.active_view()
+
+
 class MarkdownxEventListener(sublime_plugin.EventListener):
     def on_modified_async(self, view):
         for preview in _previews_for(view):

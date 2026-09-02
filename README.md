@@ -35,7 +35,7 @@ Open a Markdown file and run one of these from the Command Palette:
 - **MarkdownX: Preview in Sublime** opens or closes the preview pane.
 - **MarkdownX: Preview in Browser** opens the document in your browser.
 
-Both also appear in the Markdown context menu.
+Both also appear when you right-click the tab of a Markdown file.
 
 MarkdownX binds no keys, so it cannot take them from another package. It
 suggests two:
